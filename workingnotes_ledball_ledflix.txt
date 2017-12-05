@@ -1,0 +1,18 @@
+To whom it may concern...
+These are just som personal scribbles for this project.
+
+
+https://www.codementor.io/olatundegaruba/nodejs-restful-apis-in-10-minutes-q0sgsfhbd
+https://github.com/c3d2/ambiente/blob/master/leds.js
+https://wiki.c3d2.de/LED-Stripe
+
+npm
+https://docs.npmjs.com/getting-started/fixing-npm-permissions
+gulp
+
+
+== LEDFLIX-Schriften
+statt Bebas Neue - https://fonts.google.com/specimen/Oswald
+statt Helvetica -  https://fonts.google.com/specimen/Roboto
+
+
