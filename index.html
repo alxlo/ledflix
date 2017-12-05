@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>&lt;&lt;&lt;/&gt;&gt; ledball</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link rel="stylesheet" href="ledball.css">
+</head>
+
+<body>
+  <div id="container"></div>
+  <div id="info">
+    <a href="https://www.c3d2.de">&lt;&lt;&lt;/&gt;&gt;</a> ledball -
+    <a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+    <br />
+    MOVE mouse &amp; press LEFT: rotate, MIDDLE: zoom, RIGHT: pan
+  </div>
+
+  <script src="vendor/threejs/three.js"></script>
+
+  <script src="js.3p/controls/TrackballControls.js"></script>
+
+  <script src="js.3p/Detector.js"></script>
+  <script src="js.3p/libs/stats.min.js"></script>
+
+  <script>
+
+   if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+   var container, stats;
+
+   var camera, controls, scene, renderer;
+
+   var cross;
+
+   var cube;
+
+   init();
+   animate();
+
+   function init() {
+
+    camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.set(2, 1.9, 8);
+    camera.lookAt(0,0,0);
+
+    controls = new THREE.TrackballControls( camera );
+
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+
+    controls.noZoom = false;
+    controls.noPan = false;
+
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+
+    controls.keys = [ 65, 83, 68 ];
+
+    controls.addEventListener( 'change', render );
+
+	// world
+
+	scene = new THREE.Scene();
+	scene.background = new THREE.Color( 0x162834 );
+	scene.fog = new THREE.FogExp2( 0x162834, 0.002 );
+
+
+  var geometry = new THREE.BoxGeometry(1, 1, 1);
+
+  var material = new THREE.MeshBasicMaterial({
+    color: 0x00ff00
+  });
+
+  var material1 = new THREE.MeshStandardMaterial({
+    color: 0xe65125,
+    roughness: 0.2,
+    opacity: 0.05,
+    transparent: true,
+    wireframe: false,
+    side: THREE.DoubleSide,
+    depthWrite: false
+  });
+
+  var material2 = new THREE.MeshStandardMaterial({
+    color: 0xfff0f0,
+    roughness: 0.4,
+    opacity: 0.1,
+    transparent: true,
+      //  wireframe: true,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+
+
+
+
+  cube = new THREE.Mesh(geometry, material1);
+  cube.rotation.x = -0;
+  scene.add(cube);
+
+    // lrp lampRigParams
+    var lrp = {
+      radius: 0.5,
+      start: { y: 0.45}, // -radius <= y <= radius
+      end: { y: -0.35}, // -radius <= y <= radius
+      segments: [{n:5, df:0}, //num LEDs, negative delta angle of last led in segment
+      {n:10, df:0},
+      {n:15, df:0},
+      {n:20, df:0},
+      {n:20, df:0},
+      {n:20, df:0},
+      {n:20, df:0},
+      {n:15, df:0},
+      {n:10, df:0},
+      {n:4, df:-Math.PI}]
+    };
+
+    var lampRig = new THREE.Group();
+var thetaStart = Math.asin(lrp.start.y/lrp.radius); //angle between x-z-Plane and vector to upper rim
+var thetaEnd = Math.asin(lrp.end.y/lrp.radius); //angle between x-z-Plane and vector to lower rim
+var numSegments = lrp.segments.length;
+//var relativeHeightofLastSegment = (2*Math.PI+lpr.segments[numSegments-1].df)/2*Math.PI
+var relativeHeightOfLastSegment = 1+lrp.segments[numSegments-1].df/(2*Math.PI);
+
+var deltaThetaPerSegment = (thetaStart-thetaEnd) / (numSegments-1+relativeHeightOfLastSegment)
+
+lampRig.add(orangeHalfCircle(lrp.radius,thetaStart, thetaEnd));
+
+for (var s = 0; s < numSegments; s++){
+  var segmentThetaStart=thetaStart-s*deltaThetaPerSegment;
+  lampRig.add(orangeCircle(Math.sin(segmentThetaStart)*lrp.radius,Math.cos(segmentThetaStart)*lrp.radius));
+  if (s == numSegments-1){
+   lampRig.add(orangeCircle(Math.sin(thetaEnd)*lrp.radius,Math.cos(thetaEnd)*lrp.radius));
+
+ }
+
+}
+
+
+var sphereInnerGeometry = new THREE.SphereGeometry(lrp.radius, 30, 30,
+ 0, Math.PI * 2,
+ Math.PI/2-thetaStart,
+ thetaStart-thetaEnd);
+var sphereInner = new THREE.Mesh(sphereInnerGeometry, material2);
+lampRig.add(sphereInner);
+scene.add(lampRig);
+
+
+
+
+				// lights
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0x002288 );
+				light.position.set( -1, -1, -1 );
+				scene.add( light );
+
+				var directionalLight = new THREE.DirectionalLight(0xffffff, 10);
+				directionalLight.position.set(3, 3, 5);
+				directionalLight.lookAt(0,0,0);
+				//scene.add(directionalLight);
+
+				var directionalLight = new THREE.DirectionalLight(0xffffff, 0);
+				directionalLight.position.set(-1, 0, 0);
+				directionalLight.lookAt(0,0,0);
+				//scene.add(directionalLight);
+
+				scene.add(new THREE.AmbientLight(0xffffff));
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				//
+
+				render();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+				cube.rotation.y += 0.005;
+				render();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+
+
+
+			function orangeCircle(y, radius){
+       var dashMaterial = new THREE.LineDashedMaterial( { color: 0xe65125, dashSize: 2*Math.PI*10/4000, gapSize:2*Math.PI*10/4000, linewidth:2  } );
+       var	circGeom = new THREE.CircleGeometry(radius, 360);
+       circGeom.vertices.shift();
+       circGeom.computeLineDistances();
+       var circ = new THREE.Line(circGeom, dashMaterial);
+       circ.position.y=y;
+       circ.rotation.x=Math.PI/2;
+       return circ;
+     }
+
+     function orangeHalfCircle(radius, tStart, tEnd){
+       var dashMaterial = new THREE.LineDashedMaterial( { color: 0xe65125, dashSize: 2*Math.PI*10/4000, gapSize:2*Math.PI*10/4000, linewidth:2  } );
+       var	circGeom = new THREE.CircleGeometry(radius, 360, tEnd, tStart-tEnd);
+       circGeom.vertices.shift();
+       circGeom.computeLineDistances();
+       var circ = new THREE.Line(circGeom, dashMaterial);
+       return circ;
+     }
+
+
+
+   </script>
+
+ </body>
+ </html>
+
+
+
+
+ var params = {
+ opacity: 0.15
+};
+var diffuseColor = new THREE.Color(0x00ff00);
+
+
+
+
+
+
+
+
+
+
+
+
+
