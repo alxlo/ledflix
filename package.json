@@ -18,7 +18,10 @@
   "author": "Alexander Lorz",
   "license": "WTFPL",
   "devDependencies": {
-    "nodemon": "^1.12.5"
+    "browser-refresh": "^1.7.2",
+    "nodemon": "^1.12.5",
+    "reload": "^2.2.2",
+    "watch": "^1.0.2"
   },
   "dependencies": {
     "express": "^4.16.2"
