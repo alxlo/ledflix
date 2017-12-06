@@ -96,7 +96,7 @@
         radius: 0.5,
       start: { y: 0.45}, // -radius <= y <= radius
       end: { y: -0.35}, // -radius <= y <= radius
-      segments: [{n:5, df:0}, //num LEDs, negative delta angle of last led in segment
+      segments: [{n:5, df:0}, //num LEDs, negative angle deltaPhi of last led in segment
       {n:10, df:0},
       {n:15, df:0},
       {n:20, df:0},
@@ -105,29 +105,34 @@
       {n:20, df:0},
       {n:15, df:0},
       {n:10, df:0},
-      {n:4, df:-Math.PI}]
+      {n:4, df:-Math.PI}]  // here deltaPhi might be important when there are not enough leds
       };
 
+      // model that thing that LEDs are fixed on and the LEDs
       var lampRig = new THREE.Group();
       var thetaStart = Math.asin(lrp.start.y/lrp.radius); //angle between x-z-Plane and vector to upper rim
       var thetaEnd = Math.asin(lrp.end.y/lrp.radius); //angle between x-z-Plane and vector to lower rim
       var numSegments = lrp.segments.length;
-      //var relativeHeightofLastSegment = (2*Math.PI+lpr.segments[numSegments-1].df)/2*Math.PI
-      var relativeHeightOfLastSegment = 1+lrp.segments[numSegments-1].df/(2*Math.PI);
 
+      // we assume that all segments have the same height, except the last segment
+      // if there are not enough leds to go fully round, the last segment ist smaller
+      // var relativeHeightofLastSegment = (2*Math.PI+lpr.segments[numSegments-1].df)/2*Math.PI
+      var relativeHeightOfLastSegment = 1+lrp.segments[numSegments-1].df/(2*Math.PI);
       var deltaThetaPerSegment = (thetaStart-thetaEnd) / (numSegments-1+relativeHeightOfLastSegment)
 
-      lampRig.add(orangeHalfCircle(lrp.radius,thetaStart, thetaEnd));
-
+      // dotted helper lines
       for (var s = 0; s < numSegments; s++){
         var segmentThetaStart=thetaStart-s*deltaThetaPerSegment;
+        // one dotted circle for start of each segment layer
         lampRig.add(orangeCircle(Math.sin(segmentThetaStart)*lrp.radius,Math.cos(segmentThetaStart)*lrp.radius));
+        // final circle for end of last layer (segment might be smaller)
         if (s == numSegments-1){
           lampRig.add(orangeCircle(Math.sin(thetaEnd)*lrp.radius,Math.cos(thetaEnd)*lrp.radius));
-
         }
 
       }
+      lampRig.add(orangeHalfCircle(lrp.radius,thetaStart, thetaEnd));
+
 
 
       var sphereInnerGeometry = new THREE.SphereGeometry(lrp.radius, 30, 30,
