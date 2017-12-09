@@ -1,7 +1,8 @@
 var express = require('express'),
   app = express(),
-  port = process.env.PORT || 8888;
+  port = process.env.PORT || 8000;
 var reload = require('reload');
+
 var watch = require('watch');
 
 app.use(express.static(__dirname + '/public/html')); // static html

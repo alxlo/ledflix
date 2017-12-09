@@ -5,7 +5,9 @@ These are just som personal scribbles for this project.
 https://www.codementor.io/olatundegaruba/nodejs-restful-apis-in-10-minutes-q0sgsfhbd
 https://github.com/c3d2/ambiente/blob/master/leds.js
 https://wiki.c3d2.de/LED-Stripe
-
+https://github.com/astro/pile/blob/master/ledball/src/lib.rs#L61
+http://ustriper.hq.c3d2.de:8080/
+http://ustriper.hq.c3d2.de:8080/api/index.html
 npm
 https://docs.npmjs.com/getting-started/fixing-npm-permissions
 gulp
