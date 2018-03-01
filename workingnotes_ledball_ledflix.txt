@@ -1,5 +1,5 @@
 To whom it may concern...
-These are just som personal scribbles for this project.
+These are just some personal scribbles for this project. plz ignore
 
 
 https://www.codementor.io/olatundegaruba/nodejs-restful-apis-in-10-minutes-q0sgsfhbd
